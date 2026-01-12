@@ -18,8 +18,7 @@ class FilmResource extends JsonResource
     public function toArray($request)
     {
         return
-        [
-          
+        [          
             'title' => $this->title,
             'release_year' => $this->release_year,
             'length' => $this->length,

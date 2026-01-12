@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rules\Password;
 
-class LoginRequest extends FormRequest
+class CriticRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,8 +22,10 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
        return [
-            'login' => 'required|string|max:50',
-            'password' => ['required', 'string', Password::min(8)->max(255)->numbers()->symbols()->mixedCase()],
+        'user_id' => 'required|exists:users,id',
+        'film_id' => 'required|exists:films,id',
+        'score' => 'required|numeric|between:0,999.99',
+        'comment' => 'required|string',
         ];
     }
 }

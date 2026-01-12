@@ -1,55 +1,63 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "FilmRevue API",
-        "version": "1.0"
+        "title": "Auth API",
+        "description": "Documentation de l'authentification de l'API pour la gestion des films",
+        "contact": {
+            "name": "Maximilien FILMS",
+            "url": "http://www.films.com",
+            "email": "filmMaximilien@films.com"
+        },
+        "version": "1.0.0"
     },
+    "servers": [
+        {
+            "url": "http://localhost:8000/api",
+            "description": "Serveur de développement"
+        }
+    ],
     "paths": {
-        "/api/signup": {
+        "/register": {
             "post": {
                 "tags": [
-                    "Auth"
+                    "Authentication"
                 ],
-                "summary": "Inscription utilisateur",
-                "description": "Enregistrer un nouvel utilisateur.  Limite : 5 requêtes par minute.",
-                "operationId": "65b7ef1b1e076c033bf91055f53bd9a1",
+                "summary": "Enregistrer un nouvel utilisateur",
+                "operationId": "0903f2e0df1a8857bee538fc055417f0",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "first_name",
-                                    "last_name",
                                     "login",
                                     "email",
-                                    "password",
-                                    "password_confirmation"
+                                    "password"
                                 ],
                                 "properties": {
+                                    "login": {
+                                        "type": "string",
+                                        "example": "paulpol"
+                                    },
                                     "first_name": {
                                         "type": "string",
-                                        "example": "John"
+                                        "example": "Paul"
                                     },
                                     "last_name": {
                                         "type": "string",
-                                        "example": "Doe"
-                                    },
-                                    "login": {
-                                        "type": "string",
-                                        "example": "jdoe"
+                                        "example": "Pol"
                                     },
                                     "email": {
                                         "type": "string",
-                                        "example": "john@test.com"
+                                        "example": "paul@gig.com"
                                     },
                                     "password": {
                                         "type": "string",
                                         "example": "password123"
                                     },
-                                    "password_confirmation": {
-                                        "type": "string",
-                                        "example": "password123"
+                                    "role_id": {
+                                        "type": "integer",
+                                        "example": 2
                                     }
                                 },
                                 "type": "object"
@@ -59,38 +67,81 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Utilisateur créé"
+                        "description": "Utilisateur créé avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "access_token": {
+                                            "type": "string",
+                                            "example": "1|A8hD9fK2mN5pQ7rT3vW6xY0zB4cE1gH8jL"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "422": {
-                        "description": "Erreur de validation"
+                        "description": "Erreur de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Validation error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
-                    "429": {
-                        "description": "Trop de requêtes"
+                    "500": {
+                        "description": "Erreur serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Server error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
-        "/api/signin": {
+        "/login": {
             "post": {
                 "tags": [
-                    "Auth"
+                    "Authentication"
                 ],
-                "summary": "Connexion utilisateur",
-                "description": "Connecte l'utilisateur.  Limite : 5 requêtes par minute.",
-                "operationId": "b5cee56757c3c79c5b5f115fdc33f460",
+                "summary": "Se connecter",
+                "operationId": "2dd578ff7aba2721293dac66833b27d1",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "email",
-                                    "login"
+                                    "login",
+                                    "password"
                                 ],
                                 "properties": {
                                     "login": {
                                         "type": "string",
-                                        "example": "jdoe"
+                                        "example": "paulpol"
                                     },
                                     "password": {
                                         "type": "string",
@@ -104,31 +155,853 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Connexion réussie"
+                        "description": "Utilisateur connecté avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "auth_token": {
+                                            "type": "string",
+                                            "example": "A|NTtJ7YfygcDuXhGNqo2wWam1w0PJJnl1WlcSDry5d343d45"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
-                    "401": {
-                        "description": "Identifiants invalides"
+                    "422": {
+                        "description": "Erreur de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Validation error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
-                    "429": {
-                        "description": "Trop de requêtes"
+                    "500": {
+                        "description": "Erreur serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Server error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
-        "/api/signout": {
+        "/logout": {
             "post": {
                 "tags": [
-                    "Auth"
+                    "Authentication"
                 ],
-                "summary": "Déconnexion utilisateur",
-                "description": "Déconnecte l'utilisateur authentifié.  Limite : 5 requêtes par minute.",
-                "operationId": "b46f8611fc7d1123f2a3d573cee661c4",
+                "summary": "Déconnexion de l'utilisateur",
+                "operationId": "68a6108af04af5e3bc1ea68a6c6f1299",
                 "responses": {
                     "200": {
-                        "description": "Déconnecté"
+                        "description": "Déconnexion réussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Successfully logged out"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/critic": {
+            "post": {
+                "tags": [
+                    "Critic"
+                ],
+                "summary": "Créer une nouvelle critique",
+                "description": "Crée une nouvelle critique dans la base de données",
+                "operationId": "createCritic",
+                "requestBody": {
+                    "description": "Données de la critique à créer",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_id",
+                                    "film_id",
+                                    "score",
+                                    "comment"
+                                ],
+                                "properties": {
+                                    "user_id": {
+                                        "description": "ID de l'utilisateur",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "film_id": {
+                                        "description": "ID du film",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "score": {
+                                        "description": "Score attribué au film",
+                                        "type": "number",
+                                        "format": "float",
+                                        "minimum": 0,
+                                        "example": 4.5
+                                    },
+                                    "comment": {
+                                        "description": "Commentaire de l'utilisateur",
+                                        "type": "string",
+                                        "example": "Film intéressant avec un bon suspense"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Critique créée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Critique créée avec succès"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "user_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "film_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "score": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 4.5
+                                                },
+                                                "comment": {
+                                                    "type": "string",
+                                                    "example": "Film intéressant avec un bon suspense"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Données invalides",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erreur de validation"
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "score": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "Le champ score est requis"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Non authentifié"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Critique déjà existante",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Vous avez déjà critiqué ce film."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erreur interne du serveur"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/film": {
+            "post": {
+                "tags": [
+                    "Film"
+                ],
+                "summary": "Créer un nouveau film",
+                "operationId": "createFilm",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "release_year",
+                                    "length",
+                                    "description",
+                                    "rating",
+                                    "language_id"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "maxLength": 50,
+                                        "example": "Inception"
+                                    },
+                                    "release_year": {
+                                        "type": "integer",
+                                        "maximum": 2100,
+                                        "minimum": 1888,
+                                        "example": 2010
+                                    },
+                                    "length": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "example": 148
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Un voleur qui s'introduit dans les rêves"
+                                    },
+                                    "rating": {
+                                        "type": "string",
+                                        "enum": [
+                                            "G",
+                                            "PG",
+                                            "PG-13",
+                                            "R",
+                                            "NC-17"
+                                        ],
+                                        "example": "PG-13"
+                                    },
+                                    "special_features": {
+                                        "type": "string",
+                                        "example": "Trailers"
+                                    },
+                                    "image": {
+                                        "type": "string",
+                                        "example": "films/inception.jpg"
+                                    },
+                                    "language_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Film créé avec succès"
                     },
                     "401": {
                         "description": "Non authentifié"
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    },
+                    "500": {
+                        "description": "Erreur serveur"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/film/{id}": {
+            "put": {
+                "tags": [
+                    "Film"
+                ],
+                "summary": "Modifier un film",
+                "description": "Modifie un film déjà en base de données",
+                "operationId": "updateFilm",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du film à modifier",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Données du film à modifier",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "release_year",
+                                    "length",
+                                    "description",
+                                    "rating",
+                                    "language_id"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "description": "Titre du film",
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Inception"
+                                    },
+                                    "release_year": {
+                                        "description": "Année de sortie du film",
+                                        "type": "integer",
+                                        "maximum": 2100,
+                                        "minimum": 1888,
+                                        "example": 2010
+                                    },
+                                    "length": {
+                                        "description": "Durée du film en minutes",
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "example": 148
+                                    },
+                                    "description": {
+                                        "description": "Description du film",
+                                        "type": "string",
+                                        "example": "Un voleur qui s'introduit dans les rêves des gens"
+                                    },
+                                    "rating": {
+                                        "description": "Classification du film",
+                                        "type": "string",
+                                        "enum": [
+                                            "G",
+                                            "PG",
+                                            "PG-13",
+                                            "R",
+                                            "NC-17"
+                                        ],
+                                        "example": "PG-13"
+                                    },
+                                    "special_features": {
+                                        "description": "Fonctionnalités spéciales disponibles",
+                                        "type": "string",
+                                        "example": "Trailers"
+                                    },
+                                    "image": {
+                                        "description": "Chemin de l'image du film",
+                                        "type": "string",
+                                        "example": "films/inception.jpg"
+                                    },
+                                    "language_id": {
+                                        "description": "ID de la langue du film",
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Film modifié avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Film créé avec succès"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Inception"
+                                                },
+                                                "release_year": {
+                                                    "type": "integer",
+                                                    "example": 2010
+                                                },
+                                                "length": {
+                                                    "type": "integer",
+                                                    "example": 148
+                                                },
+                                                "description": {
+                                                    "type": "string"
+                                                },
+                                                "rating": {
+                                                    "type": "string",
+                                                    "example": "PG-13"
+                                                },
+                                                "special_features": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "image": {
+                                                    "type": "string",
+                                                    "example": "films/inception.jpg"
+                                                },
+                                                "language_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Données invalides",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erreur de validation"
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "title": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "Le champ title est requis"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Non authentifié"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erreur interne du serveur"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Film"
+                ],
+                "summary": "Suppression d'un film",
+                "operationId": "c0d3edb16339cfb114aa5b6f68ec3b1b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du film à supprimer",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Suppression réussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Successfully Deleted"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Film non trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Film not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/user/{id}": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Afficher un utilisateur",
+                "description": "Affiche les informations de l'utilisateur connecté",
+                "operationId": "getUser",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de l'utilisateur",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Utilisateur récupéré avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "first_name": {
+                                                    "type": "string",
+                                                    "example": "Jean"
+                                                },
+                                                "last_name": {
+                                                    "type": "string",
+                                                    "example": "Durant"
+                                                },
+                                                "login": {
+                                                    "type": "string",
+                                                    "example": "JDurant"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "jdurant@gmail.com"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Accès interdit"
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Modifier son mot de passe",
+                "description": "Modifie le mot de passe de l'utilisateur connecté",
+                "operationId": "updateUser",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de l'utilisateur",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Nouveau mot de passe",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "oldpassword",
+                                    "newpassword",
+                                    "newpassword_confirmation"
+                                ],
+                                "properties": {
+                                    "oldpassword": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "newpassword": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "newpassword_confirmation": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Mot de passe modifié avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Mot de passe modifié avec succès"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Données invalides"
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    },
+                    "500": {
+                        "description": "Erreur serveur"
                     }
                 },
                 "security": [
@@ -139,10 +1012,92 @@
             }
         }
     },
+    "components": {
+        "schemas": {
+            "User": {
+                "title": "User",
+                "required": [
+                    "name",
+                    "email",
+                    "login"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "ID unique de l'utilisateur",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "description": "Nom complet de l'utilisateur",
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "email": {
+                        "description": "Adresse email de l'utilisateur",
+                        "type": "string",
+                        "format": "email",
+                        "example": "john.doe@monsite.com"
+                    },
+                    "created_at": {
+                        "description": "Date de création du compte",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-15T10:30:00Z"
+                    },
+                    "updated_at": {
+                        "description": "Date de dernière modification",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-12-01T14:20:00Z"
+                    },
+                    "login": {
+                        "description": "Nom d'utilisateur pour la connexion",
+                        "type": "string",
+                        "example": "johndoe123"
+                    },
+                    "last_name": {
+                        "description": "Nom de famille",
+                        "type": "string",
+                        "example": "Doe"
+                    },
+                    "first_name": {
+                        "description": "Prénom",
+                        "type": "string",
+                        "example": "John"
+                    },
+                    "role_id": {
+                        "description": "ID du rôle de l'utilisateur",
+                        "type": "integer",
+                        "example": 2
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "sanctum": {
+                "type": "http",
+                "bearerFormat": "Token",
+                "scheme": "bearer"
+            }
+        }
+    },
     "tags": [
         {
-            "name": "Auth",
-            "description": "Auth"
+            "name": "Authentication",
+            "description": "Authentication"
+        },
+        {
+            "name": "Critic",
+            "description": "Critic"
+        },
+        {
+            "name": "Film",
+            "description": "Film"
+        },
+        {
+            "name": "User",
+            "description": "User"
         }
     ]
 }
