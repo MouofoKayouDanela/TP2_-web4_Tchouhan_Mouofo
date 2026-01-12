@@ -49,7 +49,7 @@ define('ADMIN', 2);
  * 
  * 
  * @OA\Server(
- *     url="http://localhost:8000/api",
+ *     url="https://tp2-web4-tchouhan-mouofo-main-b6sher.laravel.cloud/api",
  *     description="Serveur de développement"
  * )
  */
